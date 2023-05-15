@@ -48,6 +48,7 @@ const _jsonHeaders = {
 };
 
 Response _sumHandler(Request request, String a, String b, [String? c]) {
+  // 处理非数字型字符串
   if(num.tryParse(a) == null && num.tryParse(b) == null)
   {
     return Response.ok(
@@ -60,6 +61,7 @@ Response _sumHandler(Request request, String a, String b, [String? c]) {
   }
   final aNum = int.parse(a);
   final bNum = int.parse(b);
+  // 处理3个数字情况
   if(c != null){
       final cNum = int.parse(c);
       return Response.ok(
@@ -70,7 +72,7 @@ Response _sumHandler(Request request, String a, String b, [String? c]) {
       },
     );
   }
-  
+  //处理两个数字情况
   return Response.ok(
     _jsonEncode({'a': aNum, 'b': bNum, 'sum': aNum + bNum}),
     headers: {
