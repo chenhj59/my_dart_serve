@@ -33,7 +33,9 @@ final _router = shelf_router.Router()
   ..get('/time',
       (request) => Response.ok(DateTime.now().toUtc().toIso8601String()))
   ..get('/info.json', _infoHandler)
-  ..get('/sum/<a|[0-9]+>/<b|[0-9]+>?/<c|[0-9]+>', _sumHandler);
+  ..get('/sum/<a:string>/<b:string>', _sumHandler)
+  ..get('/sum/<a|[0-9]+>/<b|[0-9]+>', _sumHandler)
+  ..get('/sum/<a|[0-9]+>/<b|[0-9]+>/<c|[0-9]+>', _sumHandler);
 
 Response _helloWorldHandler(Request request) => Response.ok('Hello, World');
 
@@ -45,7 +47,17 @@ const _jsonHeaders = {
   'content-type': 'application.json',
 };
 
-Response _sumHandler(Request request, String a, String b, String? c) {
+Response _sumHandler(Request request, String a, String b, [String? c]) {
+  if(num.tryParse(a) == null && num.tryParse(b) == null)
+  {
+    return Response.ok(
+      _jsonEncode({'a': a, 'b': b}),
+      headers: {
+        ..._jsonHeaders,
+        'Cache-Control': 'public, max-age=604800, immutable',
+      },
+    );
+  }
   final aNum = int.parse(a);
   final bNum = int.parse(b);
   if(c != null){
