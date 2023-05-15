@@ -33,7 +33,7 @@ final _router = shelf_router.Router()
   ..get('/time',
       (request) => Response.ok(DateTime.now().toUtc().toIso8601String()))
   ..get('/info.json', _infoHandler)
-  ..get('/sum/<a|[0-9]+>/<b|[0-9]+>', _sumHandler);
+  ..get('/sum/<a|[0-9]+>/<b|[0-9]+>?/<c|[0-9]+>', _sumHandler);
 
 Response _helloWorldHandler(Request request) => Response.ok('Hello, World');
 
@@ -45,9 +45,20 @@ const _jsonHeaders = {
   'content-type': 'application.json',
 };
 
-Response _sumHandler(Request request, String a, String b) {
+Response _sumHandler(Request request, String a, String b, String? c) {
   final aNum = int.parse(a);
   final bNum = int.parse(b);
+  if(c != null){
+      final cNum = int.parse(c);
+      return Response.ok(
+      _jsonEncode({'a': aNum, 'b': bNum, 'c': cNum, 'sum': aNum + bNum + cNum}),
+      headers: {
+        ..._jsonHeaders,
+        'Cache-Control': 'public, max-age=604800, immutable',
+      },
+    );
+  }
+  
   return Response.ok(
     _jsonEncode({'a': aNum, 'b': bNum, 'sum': aNum + bNum}),
     headers: {
@@ -57,7 +68,7 @@ Response _sumHandler(Request request, String a, String b) {
   );
 }
 
-final _watch = Stopwatch();  //计数器对象
+final _watch = Stopwatch(); //计数器对象
 
 int _requestCount = 0;
 
